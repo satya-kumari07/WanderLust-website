@@ -1,0 +1,25 @@
+{
+  "name": "wanderlust",
+  "version": "1.0.0",
+  "description": "🌍 WanderLust – A full-stack travel booking website where users can explore destinations, view travel packages, and book trips. Built with HTML, CSS, JavaScript, Node.js, Express.js, and MongoDB.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satya-kumari07/WanderLust-website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/satya-kumari07/WanderLust-website/issues"
+  },
+  "homepage": "https://github.com/satya-kumari07/WanderLust-website#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mongoose": "^8.17.1"
+  }
+}
