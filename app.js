@@ -88,10 +88,10 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     res.redirect("/listings");
 }));
 
-app.use((req,res,next)=>{
-    next(new ExpressError(404, "Page Not Found"));
-    next(err);
-});
+// app.use((err,req,res,next)=>{
+//     next(new ExpressError(404, "Page Not Found"));
+//     next(err);
+// });
 
 // app.all("*", (req, res, next) => {
 //     next(new ExpressError(404, "Page Not Found"));
