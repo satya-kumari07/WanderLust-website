@@ -1,15 +1,16 @@
 const express= require("express");
+const router = express.Router({mergeParams:true});
 const app=express();
 const mongoose=require('mongoose');
-const Listing=require("./models/listing.js");
 const path=require("path");
 const methodOverride=require('method-override');
 const ejsMate=require('ejs-mate');
-const wrapAsync=require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js")
-const {listingSchema}= require("./schema.js");
-const Review=require("./models/review.js");
-const {reviewSchema}= require("./schema.js");
+const session = require("express-session");
+const flash = require("connect-flash");
+
+const listings=require("./routes/listing.js")
+const reviews=require("./routes/review.js")
 
 main()
 .then(()=>{
@@ -29,115 +30,31 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
+const sessionOptions = {
+    secret:"mysupersecretcode",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        expires:Date.now()+7*24*60*60*1000,
+        maxAge:7*24*60*60*1000,
+        httpOnly:true,
+    },
+};
+app.use(session(sessionOptions));
+app.use(flash());
+
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    next();
+});
 
 app.get("/",(req,res)=>{
     res.send("hii satya");
 });
 
-const validateListing =(req,res,next)=>{
-
-    let {error} = listingSchema.validate(req.body);
-    if(error){
-        let errMsg= error.details.map((el)=>el.message).join(",");
-        next(new ExpressError(400,errMsg));
-    }else{
-        next();
-    }
-
-}
-
-const validateReview =(req,res,next)=>{
-
-    let {error} = reviewSchema.validate(req.body);
-    if(error){
-        let errMsg= error.details.map((el)=>el.message).join(",");
-        next(new ExpressError(400,errMsg));
-    }else{
-        next();
-    }
-
-}
-//index route
-app.get("/listings",wrapAsync(async(req,res)=>{
-    const allListing=await Listing.find({});
-    res.render("listings/index.ejs",{allListing});
-}));
-
-//new Route
-app.get("/listings/new",wrapAsync(async(req,res)=>{
-    res.render("listings/new.ejs");
-}));
-
-app.post("/listings",validateListing,wrapAsync(async(req,res,next)=>{
-    const newListing=new Listing(req.body.listing);
-    await newListing.save();
-    res.redirect("/listings");
-    console.log("newListing");
-}));
-
-//show route
-app.get("/listings/:id",wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    const listings=await Listing.findById(id).populate("reviews");
-    res.render("listings/show.ejs",{listings});
-}));
-
-//edit route
-app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    const listings=await Listing.findById(id);
-    res.render("listings/edit.ejs",{listings});
-}));
-
-app.put("/listings/:id",validateListing, wrapAsync(async(req,res)=>{
-     let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,{...req.body.listing});
-    res.redirect(`/listings/${id}`);
-}));
-
-//delete route
-app.delete("/listings/:id",wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    await Listing.findByIdAndDelete(id);
-    res.redirect("/listings");
-}));
-
-//Reviews 
-//post review route
-app.post("/listings/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    let listing=await Listing.findById(id);
-    let newReview = new Review(req.body.review);
-
-    listing.reviews.push(newReview);
-
-    await newReview.save();
-    await listing.save();
-
-    res.redirect(`/listings/${id}`);
-}));
-
-//delete review route
-app.delete("/listings/:id/reviews/:reviewId",async(req,res)=>{
-    let {id,reviewId}=req.params;
-
-    await Listing.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
-    let review=await Review.findByIdAndDelete(reviewId);
-    console.log(review);
-    res.redirect(`/listings/${id}`);
-})
-// let check=async()=>{
-//     // let res=await Review.find({});
-//     let res=await Review.deleteMany({rating:"3"});
-//     console.log(res);
-// }
-// check();
-
-
-// app.use((err,req,res,next)=>{
-//     next(new ExpressError(404, "Page Not Found"));
-//     next(err);
-// });
+app.use("/listings",listings);
+app.use("/listings/:id/reviews",reviews);
 
 // app.all("*", (req, res, next) => {
 //     next(new ExpressError(404, "Page Not Found"));
