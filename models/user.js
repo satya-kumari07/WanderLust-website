@@ -9,7 +9,7 @@ const userSchema = new Schema({
     }
 });
 
-User.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose);
 
 const User = mongoose.model("User", userSchema);
 
