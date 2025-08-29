@@ -1,3 +1,8 @@
+if(process.env.NODE_ENV != "production"){
+    require('dotenv').config();
+}
+console.log(process.env.SECRET);
+
 const express= require("express");
 const router = express.Router({mergeParams:true});
 const app=express();
