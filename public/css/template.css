@@ -1,0 +1,38 @@
+.card-img-top {
+    width: 100%;
+    height: auto;
+    object-fit: cover; /* maintains aspect ratio and crops nicely */
+}
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: auto; /* horizontal scroll if needed */
+}
+.filter {
+    flex: 0 0 auto; /* prevent shrinking */
+    margin-right: 1rem;
+}
+@media (max-width: 576px) {
+    .tax-toggle {
+        width: 100%;
+        justify-content: flex-start;
+        margin-left: 0;
+    }
+}
+@media (max-width: 768px) {
+    .filter p {
+        font-size: 0.7rem;
+    }
+    .tax-toggle {
+        height: 2.5rem;
+        padding: 0.4rem;
+        font-size: 0.8rem;
+    }
+}
+.listing-card {
+    margin-bottom: 2rem;
+    transition: transform 0.2s;
+}
+.listing-card:hover {
+    transform: scale(1.03);
+}
